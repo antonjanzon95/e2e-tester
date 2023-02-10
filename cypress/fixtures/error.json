@@ -1,4 +1,4 @@
 {
-  "Response": "False",
+  "Response": false,
   "Error": "No movie was found"
 }

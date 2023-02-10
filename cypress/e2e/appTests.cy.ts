@@ -11,7 +11,7 @@ describe("should find all html", () => {
   });
 });
 
-describe("tests for movie search", () => {
+describe("mock tests for movie search", () => {
   it("should find movie on search", () => {
     cy.intercept("GET", "http://omdbapi.com/*", { fixture: "movies" }).as(
       "omdbCall"
@@ -52,10 +52,28 @@ describe("tests for movie search", () => {
     cy.get("img").should("not.exist");
     cy.get("p").contains("Inga sökresultat att visa").should("exist");
   });
+
+  it("should not find movies and show error", () => {
+    cy.intercept("GET", "http://omdbapi.com/*", { fixture: "error" }).as(
+      "omdbCall"
+    );
+
+    cy.get("#searchText").type("giveMeAnError");
+
+    cy.get("#search").click();
+
+    cy.wait("@omdbCall").then((xhr) => {
+      expect(xhr.response.body).to.have.property("Response", false);
+      expect(xhr.response.body).to.have.property("Error", "No movie was found");
+    });
+
+    cy.get(".movie").should("not.exist");
+    cy.get("p").should("contain", "Inga sökresultat att visa").should("exist");
+  });
 });
 
 describe("tests for API", () => {
-  it("should get movies from API", () => {
+  it("should fetch data from API", () => {
     cy.get("#searchText").type("Jurassic Park");
 
     cy.get("#search").click();
